@@ -1,0 +1,84 @@
+# Initialize a variable to track the overall script status
+script_status="success"
+
+# Function to add paths while ensuring no duplicates
+add_to_path () {
+  if [ -e "$1" ]; then  # Verify the existence of the path
+    if [[ ":$PATH:" != *":$1:"* ]]; then  # Check if path is already in PATH
+      export PATH="$1:$PATH"  # Append path to PATH
+    fi
+  else
+    echo "Error: Path $1 does not exist."  # Alert user if path does not exist
+    script_status="error"  # Update status due to error
+    return 1
+  fi
+}
+
+# Set critical environment variables with failure checks
+export AWS_REGION=eu-west-1 || { echo "Critical error: Failed to set AWS_REGION"; script_status="error"; }
+export DOCKER_HOST=localhost:2375 || { echo "Critical error: Failed to set DOCKER_HOST"; script_status="error"; }
+
+# Path additions
+add_to_path "$HOME/.local/bin"
+add_to_path "$HOME/projects/bash_files"
+add_to_path "$HOME/.tfenv/bin"
+add_to_path "/usr/bin/python3.10"
+add_to_path "/usr/bin/python3.11"
+add_to_path "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/"
+add_to_path "/mnt/c/Program Files/Docker/Docker/resources/bin"
+
+# Alias definitions to simplify command line operations
+alias python='python3.10'
+alias python3='python3.10'
+alias python11='python3.11'
+alias update_repos="$HOME/projects/bash_files/update_repos.sh"
+alias update_permissions="$HOME/projects/bash_files/update_permissions.sh"
+alias editbashrc="$HOME/projects/bash_files/edit_and_backup_bashrc.sh"
+alias deployment="$HOME/projects/bash_files/deployment_setup.sh"
+alias home='cd ~'
+alias mnt='cd /mnt/c/Users/ahmet.bolat'
+alias clones='cd ~/projects/clones'
+alias reload='source ~/.bashrc'
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history | tail -n1 | sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Shell options for better command history management and usability
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+shopt -s checkwinsize
+
+# Conditional sourcing of bash completion to enhance command-line experience
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+# Check for interactive shell before setting a custom prompt
+if [[ $- == *i* ]]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    case "$TERM" in
+        xterm*|rxvt*)
+            PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+            ;;
+    esac
+    # Display the final message based on the script_status
+    if [[ "$script_status" == "success" ]]; then
+        echo "Terminal ready."
+    else
+        echo "Check settings, there were errors."
+    fi
+else
+    echo "Not an interactive shell, exiting script."
+    exit
+fi
