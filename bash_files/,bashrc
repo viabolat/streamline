@@ -1,0 +1,104 @@
+echo "Sourcing environment settings..."
+
+# Environment Variables and PATH adjustments
+export AWS_REGION=eu-west-1
+export DOCKER_HOST=localhost:2375
+export PATH="$PATH:$HOME/projects/bash_files"
+
+# Path Settings - Ensure no duplicates
+add_to_path () {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) export PATH="$1:$PATH";;
+  esac
+}
+
+add_to_path "$HOME/.local/bin"
+add_to_path "$HOME/.tfenv/bin"
+add_to_path "/usr/bin/python3.10"
+add_to_path "/usr/bin/python3.11"
+add_to_path "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/"
+add_to_path "/mnt/c/Program Files/Docker/Docker/resources/bin"
+
+# History Configuration
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# Window Size Check
+shopt -s checkwinsize
+
+# Lesspipe Setup (keep system default)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# Python Alias Configuration
+alias python='python3.10'
+alias python3='python3.10'
+alias python11='python3.11'
+
+# SSH Agent Setup
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_rsa
+fi
+
+# Docker Desktop for Windows Setup
+if grep -qi microsoft /proc/version; then
+    echo "Running in WSL environment"
+    # Check if Docker Desktop is running using PowerShell
+    if powershell.exe -Command "Get-Process -Name 'Docker Desktop' -ErrorAction SilentlyContinue" | grep -q "Docker Desktop"; then
+        echo "Docker is already running"
+    else
+        # If Docker Desktop is not running, ask to start it
+        read -p "Docker Desktop is not running. Start Docker Desktop? (y/n) " -n 1 -r
+        echo    # move to a new line
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "Starting Docker Desktop for Windows..."
+            /mnt/c/Program\ Files/Docker/Docker/Docker\ Desktop.exe &
+            echo "Docker Desktop is starting..."
+        fi
+    fi
+fi
+
+# Command completion settings
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
+
+# Ensure common commands use color
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history | tail -n1 | sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias update_repos="$HOME/projects/bash_files/update_repos.sh"
+alias update_permissions="~/projects/bash_files/update_permissions.sh"
+
+
+# Interactive check 
+case $- in
+    *i*) ;;
+    *) return;;
+esac
+
+# Interactive-only configurations
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+case "$TERM" in
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+        ;;
+esac
+
+# Sourcing Additional Files
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
