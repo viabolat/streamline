@@ -1,0 +1,7 @@
+{
+    "bitbucket_ssh_url": "git@bitbucket.org:yourusername/yourrepo.git",
+    "github_ssh_url": "git@github.com:yourusername/yournewrepo.git",
+    "AWS_Region": "eu-west-1",
+    "email": "your.email@example.com",
+    "name_surname": "Your Name"
+}
