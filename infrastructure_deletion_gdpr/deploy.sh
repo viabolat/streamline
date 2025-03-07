@@ -13,11 +13,11 @@ fi
 
 account_id=$(aws sts get-caller-identity --output text --query 'Account')
 case "${account_id}" in
-066991206117)
+#acct#)
     ACCOUNT="conveh"
     STAGE="int"
     ;;
-482694160481)
+#acct#)
     ACCOUNT="conveh"
     STAGE="prod"
     ;;
