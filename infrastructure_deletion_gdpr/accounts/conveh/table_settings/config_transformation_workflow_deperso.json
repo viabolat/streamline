@@ -1,0 +1,27 @@
+{
+  "source_gdpr_deperso": [
+    {
+      "workflow_position": 1,
+      "operation_type": "custom_transformation",
+      "operation": {
+        "source_entity_name": "source_table_gdpr",
+        "target_config": {
+          "target_entity_name": "source_table_gdpr_01"
+        },
+        "config": {
+          "module_path": "gdpr_deperso.py"
+        }
+      }
+    },
+    {
+      "workflow_position": 2,
+      "write_action": {
+        "source_entity_name": "source_table_gdpr_01",
+        "config": {
+          "table_name": "te_deletions_key_data",
+          "write_mode": "append"
+        }
+      }
+    }
+  ]
+}

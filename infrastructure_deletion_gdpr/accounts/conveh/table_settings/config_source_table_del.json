@@ -1,0 +1,8 @@
+[
+  {
+    "table_name": "sdm_key_data_src",
+    "load_type": "full",
+    "entity_name": "source_table_del",
+    "push_predicate": "1 = 2"
+  }
+]

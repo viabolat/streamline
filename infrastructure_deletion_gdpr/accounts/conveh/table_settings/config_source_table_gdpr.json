@@ -1,0 +1,7 @@
+[
+  {
+    "table_name": "sdm_key_data_src",
+    "load_type": "delta",
+    "entity_name": "source_table_gdpr"
+  }
+]
